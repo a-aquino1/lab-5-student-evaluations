@@ -143,6 +143,7 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: setup
 # code chunk for loading packages
+library(dplyr)
 
 ```
 
@@ -151,7 +152,8 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: load-data
 # code chunk for importing the data
-
+teacher_evals <- read.csv("data-raw/teacher_evals.csv")
+#loaded the teacher_evals data, and named it "data", changed the name to teacher_evals to be more specific
 ```
 
 ### Data Inspection + Summary
@@ -161,7 +163,10 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: explore-data
 # you may want to use code to answer this question
-
+teacher_evals |>
+  glimpse()
+#used glimpse() to show an overview of the teacher_eval data file
+# For a brief overview I decided to use glimpse() in order to provide a clean short overview of the teacher_eval data.
 ```
 
 **4. What is the unit of observation (i.e. a single row in the dataset) identified by?**
@@ -184,6 +189,12 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: data-cleaning
 # code chunk for Q4
+teacher_evals |>
+  rename(sex = gender) |>
+  mutate(respondent_number = resp_share*no_participants) |>
+  filter(respondent_number > 10) |>
+  select(course_id : SET_score_avg, percent_failed_cur, academic_degree : sex)
+  
 
 ```
 
