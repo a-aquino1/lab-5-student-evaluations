@@ -1,6 +1,10 @@
 ---
 title: "Lab 5: Student Evaluations of Teaching"
 author: "Aida Aquino Arias"
+format: html
+execute: 
+  error: true
+  echo: true
 ---
 In this lab, we will be using the `dplyr` package to explore student evaluations
 of teaching data. 
@@ -144,6 +148,7 @@ included in the `teacher_evals_codebook.pdf`.
 #| label: setup
 # code chunk for loading packages
 library(dplyr)
+library(tidyverse)
 
 ```
 
@@ -164,7 +169,7 @@ teacher_evals <- read.csv("data-raw/teacher_evals.csv")
 #| label: explore-data
 # you may want to use code to answer this question
 teacher_evals |>
-  glimpse()
+  summarise(data)
 #used glimpse() to show an overview of the teacher_eval data file
 # For a brief overview I decided to use glimpse() in order to provide a clean short overview of the teacher_eval data.
 ```
@@ -174,7 +179,9 @@ teacher_evals |>
 ```{r}
 #| label: row-identification
 # you may want to use code to answer this question
-
+teacher_evals|>
+  summarize(teacher_id,student_id)
+# i am unsure what this section means or is asking for
 ```
 
 **5. Use _one_ `dplyr` pipeline to clean the data by:**
@@ -191,11 +198,12 @@ teacher_evals |>
 # code chunk for Q4
 teacher_evals |>
   rename(sex = gender) |>
-  mutate(respondent_number = resp_share*no_participants) |>
-  filter(respondent_number > 10) |>
+  filter(resp_share*no_participants > 10) |>
   select(course_id : SET_score_avg, percent_failed_cur, academic_degree : sex)
-  
 
+cleaned_teacher_evals <- write_csv(teacher_evals, "data-clean/cleaned_teacher_eval.csv" )
+  
+#looked throuhg the r book as a double check, followed the prompt as best as i could struggled with turning ints into characters.
 ```
 
 **6. How many unique instructors and unique courses are present in the cleaned dataset?**
@@ -203,7 +211,9 @@ teacher_evals |>
 ```{r}
 #| label: unique-courses
 # code chunk for Q5
-
+cleaned_teacher_evals |>
+  summarize(unique_instructors = n_distinct (teacher_id),
+            unique_courses = n_distinct(course_id))
 ```
 
 **7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**
@@ -211,7 +221,9 @@ teacher_evals |>
 ```{r}
 #| label: uncovering-missing-values
 # code chunk for Q6
-
+cleaned_teacher_evals |>
+  filter(if_any(.cols = -course_id, is.na))|> 
+  select(course_id, teacher_id)
 ```
 
 **8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**
@@ -219,7 +231,11 @@ teacher_evals |>
 ```{r}
 #| label: exploring-demographics-of-instructors
 # code chunk for Q7
-
+cleaned_teacher_evals |>
+  select(academic_degree,seniority,gender) |>
+  distinct(academic_degree,seniority,gender, .keep_all = TRUE) |>
+  count(academic_degree,seniority,gender) |>
+  summarize(academic_degree,seniority,gender)
 ```
 
 **9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**
@@ -227,7 +243,9 @@ teacher_evals |>
 ```{r}
 #| label: teacher-course-asked-every-question
 # code chunk for Q8
-
+cleaned_teacher_evals |>
+  summarise(n_distinct(teacher_id),
+            n_distinct(course_id))
 ```
 
 ## Rate my Professor
@@ -237,7 +255,8 @@ teacher_evals |>
 ```{r}
 #| label: question-1-high-low
 # code chunk for Q9
-
+cleaned_teacher_evals |>
+  select(teacher_id, )
 ```
 
 **11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**
@@ -253,5 +272,6 @@ teacher_evals |>
 ```{r}
 #| label: female-instructor-student-response
 # code chunk for Q11
-
+cleaned_teacher_eval|>
+  group_by(sex == "female")
 ```
