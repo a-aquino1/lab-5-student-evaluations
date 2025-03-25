@@ -245,7 +245,8 @@ cleaned_teacher_evals |>
 # code chunk for Q8
 cleaned_teacher_evals |>
   summarise(n_distinct(teacher_id),
-            n_distinct(course_id))
+            n_distinct(course_id))|>
+  summarize()
 ```
 
 ## Rate my Professor
